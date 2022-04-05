@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1649156681637.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B70DDAF8",
+    "lastKnownWriteTime" : 1649159048,
+    "last_content_update" : 1649159048839,
+    "path" : "E:/J-OCTA/cases/VSSC/ML_data_set/interglad/RI_interglad.R",
+    "project_path" : "RI_interglad.R",
+    "properties" : {
+        "cursorPosition" : "13,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

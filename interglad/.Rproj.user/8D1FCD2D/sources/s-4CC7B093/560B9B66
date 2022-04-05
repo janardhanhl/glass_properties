@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1649157065305.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "560B9B66",
+    "lastKnownWriteTime" : 7160569971446915616,
+    "last_content_update" : 1649157065305,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "1FCAD15F",
+        "caption" : "RI_interglad",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=RI_interglad&cache_key=1FCAD15F",
+        "displayedObservations" : 15015,
+        "environment" : "",
+        "object" : "RI_interglad",
+        "preview" : 0,
+        "totalObservations" : 15015,
+        "variables" : 19
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
