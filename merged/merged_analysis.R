@@ -1,4 +1,4 @@
-sciglass <- read.csv('RI_sciglass.csv')
+sciglass <- read.csv('../sciglass/RI_sciglass.csv')
 View(sciglass)
 summary(sciglass)
 head(sciglass)
