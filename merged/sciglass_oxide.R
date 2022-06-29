@@ -29,20 +29,39 @@ randsampl <- sample (1: nrow(RI), nrow(RI)/4)
 train <- RI[-randsampl,]
 test <- RI[randsampl,]$RefractiveIndex
 library(randomForest)
-rf.fit <- randomForest(RefractiveIndex ~., data = RI[-randsampl,], ntree=500, importance=TRUE)
+rf.fit <- randomForest(RefractiveIndex ~., data = RI[-randsampl,], ntree=1000, importance=TRUE)
 rf.fit
 summary(rf.fit)
 plot(rf.fit)
 rf.predict <- predict(rf.fit, newdata = RI[randsampl,])
 plot(rf.predict,test)
 library(MASS)
-lm(rf.predict~0+test)
-abline(lm(rf.predict~0+test), col="red")
+lm(rf.predict~test)
+abline(lm(rf.predict~test), col="red")
 mean((test-rf.predict)^2)
 saveRDS(rf.fit, "./rf.fit.rds")
 
 # Deep learning for RI learning and prediction 
+library(reticulate)
 library(keras)
 library(tensorflow)
-modeldl <- keras_model_sequential()
+x <- model.matrix(RefractiveIndex ~. -1, data=RI) %>% scale()
+y <- RI$RefractiveIndex
+modeldl <- keras_model_sequential() %>% 
+  layer_dense(units = 50, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.4) %>%
+  layer_dense(units = 1)
 
+modeldl %>% compile(loss="mse", optimizer="adam",
+                    metrics = c("mean_absolute_error", "accuracy"))
+history <- modeldl %>% fit(
+  x[-randsampl,],y[-randsampl], epochs=1500, batch_size=32,
+  validation_data=list(x[randsampl,], y[randsampl] )
+)
+View(history)
+plot(history)
+predected <- predict(modeldl, x[randsampl,])
+plot(predected,test)
+lm(predected~test)
+abline(lm(predected~test), col='red')
+# random forest gave better results compared to this NN Model.
