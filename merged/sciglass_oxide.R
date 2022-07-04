@@ -40,6 +40,14 @@ lm(rf.predict~test)
 abline(lm(rf.predict~test), col="red")
 mean((test-rf.predict)^2)
 saveRDS(rf.fit, "./rf.fit.rds")
+rf.fit <- readRDS("rf.fit.rds")
+print(rf.fit)
+rf.predict <- predict(rf.fit, newdata = RI[randsampl,]) 
+# load Random forest library before running rf predict from saved model
+plot(test, rf.predict)
+lm(test~rf.predict)
+abline(lm(test~rf.predict), col="red")
+mean((rf.predict-test)^2)
 
 # Deep learning for RI learning and prediction 
 library(reticulate)
@@ -65,3 +73,78 @@ plot(predected,test)
 lm(predected~test)
 abline(lm(predected~test), col='red')
 # random forest gave better results compared to this NN Model.
+
+# NN model 2
+modeldl2 <- keras_model_sequential() %>% 
+  layer_dense(units = 256, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.4) %>%
+  layer_dense(units = 128, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.4) %>%
+  layer_dense(units = 1)
+
+modeldl2 %>% compile(loss="mse", optimizer="adam",
+                    metrics = c("mean_absolute_error", "accuracy"))
+history2 <- modeldl2 %>% fit(
+  x[-randsampl,],y[-randsampl], epochs=700, batch_size=32,
+  validation_data=list(x[randsampl,], y[randsampl] )
+)
+predected2 <- predict(modeldl2, x[randsampl,])
+plot(predected2,test)
+lm(predected2~test)
+abline(lm(predected~test), col='red')
+mean((predected2-test)^2)
+
+save_model_tf(modeldl2, "modeldl2") # saving tf model
+read_model <- load_model_tf("modeldl2") # loading tf model 
+reloaded2 <- predict(read_model, x[randsampl,])
+
+
+# NN model 3
+modeldl3 <- keras_model_sequential() %>% 
+  layer_dense(units = 138, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 68, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 1)
+
+modeldl3 %>% compile(loss="mse", optimizer="adam",
+                     metrics = c("mean_absolute_error", "accuracy"))
+history3 <- modeldl3 %>% fit(
+  x[-randsampl,],y[-randsampl], epochs=1500, batch_size=64,
+  validation_data=list(x[randsampl,], y[randsampl] )
+)
+history3
+predected3 <- predict(modeldl3, x[randsampl,])
+plot(test,predected3)
+lm(test~predected3)
+abline(lm(test~predected3), col='red')
+mean((predected3-test)^2)
+save_model_tf(modeldl3, "modeldl3") # saving tf model
+read_model3 <- load_model_tf("modeldl3") # loading tf model
+
+ # NN model 4
+modeldl4 <- keras_model_sequential() %>% 
+  layer_dense(units = 256, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 138, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 68, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 1)
+
+modeldl4 %>% compile(loss="mse", optimizer="adam",
+                     metrics = c("mean_absolute_error"))
+history4 <- modeldl4 %>% fit(
+  x[-randsampl,],y[-randsampl], epochs=700, batch_size=128,
+  validation_data=list(x[randsampl,], y[randsampl] )
+)
+history4
+predected4 <- predict(modeldl4, x[randsampl,])
+plot(test,predected4)
+lm(test~predected4)
+abline(lm(test~predected4), col='red')
+mean((predected4-test)^2)
+save_model_tf(modeldl4, "modeldl4") # saving tf model
+read_model <- load_model_tf("modeldl4") # loading tf model 
+reloaded <- predict(read_model, x[randsampl,])
+
