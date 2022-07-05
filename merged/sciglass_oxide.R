@@ -1,3 +1,4 @@
+# Training model for RI prediction ----
 library(sqldf)
 RI <- read.csv("sciglass_glasspy_atfrc_RI.csv")
 View(RI)
@@ -148,3 +149,65 @@ save_model_tf(modeldl4, "modeldl4") # saving tf model
 read_model <- load_model_tf("modeldl4") # loading tf model 
 reloaded <- predict(read_model, x[randsampl,])
 
+
+# Training model for Abbe prediction ----
+
+# Random forest for Abbe fitting and prediction 
+set.seed(10)
+randsampl <- sample (1: nrow(abbe), nrow(abbe)/4)
+train <- abbe[-randsampl,]
+test <- abbe[randsampl,]$AbbeNumber
+library(randomForest)
+rf.fit <- randomForest(AbbeNumber ~., data = abbe[-randsampl,], ntree=1000, importance=TRUE)
+rf.fit
+summary(rf.fit)
+plot(rf.fit)
+rf.predict <- predict(rf.fit, newdata = abbe[randsampl,])
+plot(test,rf.predict)
+library(MASS)
+lm(test~rf.predict)
+abline(lm(test~rf.predict), col="red")
+mean((test-rf.predict)^2)
+saveRDS(rf.fit, "./rf.fit.abbe.rds")
+rf.fit <- readRDS("rf.fit.abbe.rds")
+print(rf.fit)
+rf.predict <- predict(rf.fit, newdata = abbe[randsampl,]) 
+# load Random forest library before running rf predict from saved model
+plot(test, rf.predict)
+lm(test~rf.predict)
+abline(lm(test~rf.predict), col="red")
+mean((rf.predict-test)^2)
+
+
+# NN model for abbe prediction
+library(reticulate)
+library(keras)
+library(tensorflow)
+attach(abbe)
+x <- model.matrix(AbbeNumber ~. -1, data=abbe) %>% scale()
+y <- abbe$AbbeNumber
+
+modeldlabbe <- keras_model_sequential() %>% 
+  layer_dense(units = 256, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 138, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 68, activation = "relu", input_shape=ncol(x)) %>%
+  layer_dropout(rate=0.1) %>% 
+  layer_dense(units = 1)
+
+modeldlabbe %>% compile(loss="mse", optimizer="adam" ,
+                     metrics = c("mean_absolute_error"))
+historyabbe <- modeldlabbe %>% fit(
+  x[-randsampl,],y[-randsampl], epochs=1000, batch_size=128,
+  validation_data=list(x[randsampl,], y[randsampl] )
+)
+historyabbe
+predectedabbe <- predict(modeldlabbe, x[randsampl,])
+plot(test,predectedabbe)
+lm(test~predectedabbe)
+abline(lm(test~predectedabbe), col='red')
+mean((test-predectedabbe)^2)
+save_model_tf(modeldlabbe, "modeldlabbe") # saving tf model
+read_model <- load_model_tf("modeldlabbe") # loading tf model 
+reloaded <- predict(read_model, x[randsampl,])
