@@ -211,3 +211,5 @@ mean((test-predectedabbe)^2)
 save_model_tf(modeldlabbe, "modeldlabbe") # saving tf model
 read_model <- load_model_tf("modeldlabbe") # loading tf model 
 reloaded <- predict(read_model, x[randsampl,])
+
+
