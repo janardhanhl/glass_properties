@@ -213,3 +213,12 @@ read_model <- load_model_tf("modeldlabbe") # loading tf model
 reloaded <- predict(read_model, x[randsampl,])
 
 
+# Using pre trained NN models for prediction with the input files
+read_model <- load_model_tf("modeldl4") # loading tf model )
+pre=read.csv("prediction_upload_file.csv")
+x <- model.matrix( ~. -1, data=pre)
+reloaded <- predict(read_model, x[])
+
+
+
+
