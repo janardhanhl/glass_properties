@@ -1,10 +1,11 @@
 
-library(randomForest, quietly =TRUE)
+library(randomForest)
 library(vroom)
 library(shiny)
 
 rf.fit.RI <- readRDS("rf.fit.rds")
 rf.fit.Abbe <- readRDS("rf.fit.abbe.rds")
+template <- read.csv("template.csv")
 # Define UI for application that draws a histogram
 
 
@@ -15,44 +16,64 @@ ui <- fluidPage(
   titlePanel("Random Forest Regression"),
   titlePanel("Estimation of Refractive Index (RI) and Abbe number"),
   h2 ("Please upload the Composition File "),
-  h6 ("___________________________________________________________________________________"),
-  h6 ("___________________________________________________________________________________"),
+  hr (),
+  hr (),
   h1 (" "),
   sidebarPanel(
-  fluidRow(column(12,
+    fluidRow(column(12, 
+                    downloadButton("Download2", label ="Download Template", class = "btn-s  "  )
+    )),
+    h5(" "),
     fileInput("upload", "select a .csv file", accept = ".csv"),
+  h1(" "),
+  fluidRow(
+    column (6,
+            actionButton("predict", "predict RI & Abbe", class = "btn-lg btn-success" ),
+    )
+  ),
+  h2 (" "),
+  fluidRow(
+    column (6, 
+            downloadButton("Download1", label ="Download Prediction", class = "btn-lg btn-success"  )
+    )
   )),
-  h1(" ")),
   mainPanel(
+  h5(" 1. Download the template file 2. upload the glass composition in atomic fractions "),
+  h5("3. Predict the glass RI and Abbe number 4. Download the predicted utput"),
+  hr(),
+  p(strong("uploaded file properties")),
   tableOutput("files1"),
+  hr(),
+  p(strong("Top entries in input file")),
+  hr(),
   tableOutput("head1"),
+  hr(),
   tableOutput("files2"),
   tableOutput("head2"),
-  
-  fluidRow(
-  column (6,
-  actionButton("predict", "predict RI & Abbe", class = "btn-lg btn-success" ),
-  )
-),
-h2 (" "),
-fluidRow(
-  column (6, 
-          downloadButton("Download1", label ="Download Prediction", class = "btn-lg btn-success"  )
-  )
-),
-
+  hr(),
+  h5(p(strong("Prediction"))),
+  hr(),
 dataTableOutput("predictedRI")
 
 
 ))
  
-#----------------------------------------------------------------------
-#--------------------------- Server Functions -------------------------
-#----------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#--------------------------- Server Functions ----------------------------------
+#-------------------------------------------------------------------------------
 
 
 server <- function(input, output, session) {
     unlink("input_data.csv")  
+ 
+   output$Download2 <- downloadHandler(
+    filename = function(){
+      paste("Template",".csv")
+    },
+    content = function(file){
+      write.csv(template,file)
+    }
+  )
   
   dataIN <- reactive({
     req(input$upload)
@@ -80,7 +101,7 @@ server <- function(input, output, session) {
     }) # giving data frame is important else output will not be rendered
   
   
-  output$files1 <- renderTable(input$upload)
+  output$files1 <- renderTable(input$upload )
   output$head1 <- renderTable(head(dataIN()))
   output$predictedRI <- renderDataTable(prediction())
   
