@@ -1,0 +1,13 @@
+name: Random_forest_predictor
+title: Random_forest_predictor
+username:
+account: janardhanhl
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6628379
+bundleId: 6090254
+url: https://janardhanhl.shinyapps.io/Random_forest_predictor/
+when: 1657601383.89349
+lastSyncTime: 1657601383.89351
+asMultiple: FALSE
+asStatic: FALSE
